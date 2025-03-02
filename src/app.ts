@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import dbInit from './db/init'; // Import your DB initialization function
+import routes from "./routes";
 
 dotenv.config();
 
@@ -11,6 +12,9 @@ app.use(express.json());
 
 // Initialize database
 dbInit(); // Initialize database and sync models
+
+app.use('/api/v1', routes); // Assuming your routes are organized in a 'routes' directory
+
 
 app.get("/", (req, res) => {
   res.send("Backend is running!");

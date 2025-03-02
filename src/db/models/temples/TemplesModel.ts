@@ -1,6 +1,7 @@
 import { DataTypes, Model, Optional } from 'sequelize';
 import sequelizeConnection from '../../config';
 
+// Define the attributes for the Temples model
 interface TemplesAttributes {
   temple_id: number;
   temple_name: string;
@@ -12,24 +13,28 @@ interface TemplesAttributes {
   opening_hours: string | null;
   latitude: number | null;
   longitude: number | null;
-  temple_thumbnail: string | null; 
-  temple_images_url: string[] | null; 
-  image_urls: string[]; 
-  video_urls: string[];
-  temple_video_url: string[] | null; 
-  history: string | null; 
-  facilities: string[] | null; 
-  festivals: string[] | null; 
-  status: string;
+  temple_thumbnail: string | null; // New column for temple image thumbnail
+  temple_images_url: string[] | null; // New column for storing temple images URLs
+  temple_video_url: string[] | null; // New column for storing temple video URLs
+  history: string | null; // History of the temple
+  opening_timings: {
+    morning: string | null;
+    evening: string | null;
+    full_day: string | null;
+  } | null; // Opening timings for different periods of the day
+  facilities: string[] | null; // List of available facilities as array of strings
+  festivals: string[] | null; // List of festivals celebrated at the temple
 }
 
+// Define the input type for optional fields
 export interface TemplesInput extends Optional<
   TemplesAttributes, 
   'temple_id' | 'temple_location' | 'temple_description' | 'phone_number' | 
   'email' | 'website' | 'opening_hours' | 'latitude' | 'longitude' | 
   'temple_thumbnail' | 'temple_images_url' | 'temple_video_url' | 'history' | 
-   'facilities' | 'festivals' | 'status'> {}
+  'opening_timings' | 'facilities' | 'festivals'> {}
 
+// Define the output type for required fields
 export interface TemplesOutput extends Required<TemplesAttributes> {}
 
 class TemplesModel extends Model<TemplesAttributes, TemplesInput> implements TemplesAttributes {
@@ -44,19 +49,19 @@ class TemplesModel extends Model<TemplesAttributes, TemplesInput> implements Tem
   public latitude!: number | null;
   public longitude!: number | null;
   public temple_thumbnail!: string | null;
-  public temple_images_url!: string[] | null;
-  public temple_video_url!: string[] | null; 
-  public image_urls!: string[];
-  public video_urls!: string[];
-  public history!: string | null; 
-  public facilities!: string[] | null; 
-  public festivals!: string[] | null; 
-  public status!: string;
+  public temple_images_url!: string[] | null; // New column for temple image URLs
+  public temple_video_url!: string[] | null; // New column for temple video URLs
+  public history!: string | null; // History of the temple
+  public opening_timings!: { morning: string | null, evening: string | null, full_day: string | null } | null; // Opening timings
+  public facilities!: string[] | null; // List of available facilities
+  public festivals!: string[] | null; // List of festivals
 
+  // Timestamps (createdAt and updatedAt)
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 }
 
+// Initialize the model
 TemplesModel.init(
   {
     temple_id: {
@@ -89,7 +94,7 @@ TemplesModel.init(
       allowNull: true,
     },
     opening_hours: {
-      type: DataTypes.TEXT,
+      type: DataTypes.STRING(255),
       allowNull: true,
     },
     latitude: {
@@ -101,27 +106,23 @@ TemplesModel.init(
       allowNull: true,
     },
     temple_thumbnail: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.STRING(255), // Store image URL as a string
       allowNull: true,
     },
     temple_images_url: {
-      type: DataTypes.ARRAY(DataTypes.STRING),
+      type: DataTypes.ARRAY(DataTypes.STRING), // Array of strings for multiple image URLs
       allowNull: true,
     },
     temple_video_url: {
-      type: DataTypes.ARRAY(DataTypes.STRING),
+      type: DataTypes.ARRAY(DataTypes.STRING), // Array of strings for multiple video URLs
       allowNull: true,
     },
-    image_urls: {
-        type: DataTypes.ARRAY(DataTypes.TEXT),
-        allowNull: true,
-      },
-      video_urls: {
-        type: DataTypes.ARRAY(DataTypes.TEXT),
-        allowNull: true,
-      },
     history: {
       type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    opening_timings: {
+      type: DataTypes.JSONB, // Storing timings as JSONB (for structured data)
       allowNull: true,
     },
     facilities: {
@@ -131,11 +132,6 @@ TemplesModel.init(
     festivals: {
       type: DataTypes.ARRAY(DataTypes.STRING), // Array of strings for multiple festivals
       allowNull: true,
-    },
-    status: {
-      type: DataTypes.STRING(20),
-      allowNull: false,
-      defaultValue: 'active',
     },
   },
   {
