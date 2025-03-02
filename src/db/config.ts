@@ -4,15 +4,13 @@ dotenv.config();
 
 function getConnection() {
   // Use environment variables for database credentials
-  const sequelize = new Sequelize({
-    database: process.env.DB_NAME || 'kalkinewdatabase',   // Default to 'newdatabasekalki' if not found in .env
-    username: process.env.DB_USER || 'postgres',          // Default to 'postgres' if not found in .env
-    password: process.env.DB_PASSWORD || 'admin',        // Default to 'admin' if not found in .env
-    host: process.env.DB_HOST || 'localhost',            // Default to 'localhost' if not found in .env
-    port: Number(process.env.DB_PORT) || 5432,           // Default to 5432 if not found in .env
+  const sequelize = new Sequelize('Kalki', 'postgres', 'Viswa#1431', {
+    host: 'localhost',
+    port: 5432,
     dialect: 'postgres',
-    logging: false, // Disable logging if you don't want to log all SQL queries
+    logging: false
   });
+  
 
   // Test connection
   sequelize.authenticate()
@@ -27,14 +25,15 @@ function getConnection() {
   return sequelize;
 }
 
-// Assign the return value of getConnection to sequelizeConnection
 const sequelizeConnection = getConnection();
 
-// Optionally sync the models (usually done once at the start of the application)
 sequelizeConnection.sync({ force: false }).then(() => {
   console.log('Database sync complete!');
 }).catch((error) => {
   console.error('Error syncing database:', error);
 });
+
+
+
 
 export default sequelizeConnection;
