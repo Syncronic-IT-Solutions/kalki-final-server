@@ -11,7 +11,8 @@ interface PujaPackagesAttributes {
   package_description?: string | null;
   number_of_devotees?: number | null;
   price: number;
-  puja_date: Date;  // ✅ Added puja_date field
+  puja_date: Date;
+  puja_speciality: string;  
   created_by?: number | null;
 }
 
@@ -24,7 +25,8 @@ class PujaPackagesModel extends Model<PujaPackagesAttributes, PujaPackagesInput>
   public package_description!: string | null;
   public number_of_devotees!: number | null;
   public price!: number;
-  public puja_date!: Date;  // ✅ Added puja_date
+  public puja_date!: Date;
+  public puja_speciality: string = ''; // Default value set here
   public created_by!: number | null;
 
   public readonly createdAt!: Date;
@@ -79,12 +81,17 @@ PujaPackagesModel.init(
       allowNull: true,
     },
     price: {
-      type: DataTypes.DECIMAL(10, 2), // ✅ No default value set
+      type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
     },
     puja_date: {
       type: DataTypes.DATEONLY, // DATE without time component
       allowNull: true,
+    },
+    puja_speciality: {
+      type: DataTypes.STRING(255),
+      allowNull: false,
+      defaultValue: '',  // Ensure that the field has a default value if not provided
     },
     created_by: {
       type: DataTypes.INTEGER,

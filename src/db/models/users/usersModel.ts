@@ -41,10 +41,10 @@ class UserModel extends Model<UserAttributes, UserInput> implements UserAttribut
   static associate(models: any) {
     UserModel.hasMany(models.BookingHistoryModel, {
       foreignKey: 'userid',
-      as: 'bookings', // Alias for query usage
+      as: 'bookings',
     });
 
-    UserModel.hasMany(models.Review, {
+    UserModel.hasMany(models.ReviewsModel, {  // Add this association
       foreignKey: 'userid',
       as: 'reviews',
     });

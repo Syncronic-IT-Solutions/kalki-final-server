@@ -3,7 +3,7 @@ import sequelizeConnection from '../../config';
 import PujaModel from '../pujas/PujaModel';
 import ReviewsModel from '../pujas/ReviewsModel';
 import UserModel from '../users/usersModel';
-import PujaDatesModel from '../pujas/PujaDtaesPackagesModel';
+import PujaDatesModel from '../pujas/pujaDatesModel';
 import AssignedTasksModel from '../agent/AssignedTasks';
 import AgentDetailsModel from '../agent/AgentDetails';
 
@@ -13,7 +13,9 @@ interface BookingHistoryAttributes {
   userid: string;
   puja_id: string;
   puja_date: Date;
-  packages: string;
+  puja_name: string;
+  package_id: string;
+  package_name: string;
   devotee_names: string[];
   devotee_gothra: string[];
   devotee_date_of_birth: Date[];
@@ -28,7 +30,7 @@ interface BookingHistoryAttributes {
   booking_status: string;
   puja_status: string;
   payment_method: string;
-  payment_refference: string;
+  payment_reference: string; // Fixed typo here
   completed_image_url_path: string | null;
   completed_video_url_path: string | null;
 }
@@ -44,7 +46,7 @@ export interface BookingHistoryInput extends Optional<
   | 'puja_status'
   | 'special_instructions'
   | 'is_shipping_address_same_as_billing'
-  | 'payment_refference'
+  | 'payment_reference' // Fixed typo here as well
   | 'completed_image_url_path'
   | 'completed_video_url_path'
 > {}
@@ -59,7 +61,9 @@ class BookingHistoryModel
   public userid!: string;
   public puja_id!: string;
   public puja_date!: Date;
-  public packages!: string;
+  public puja_name!: string;
+  public package_id!: string;
+  public package_name!: string;
   public devotee_names!: string[];
   public devotee_gothra!: string[];
   public devotee_date_of_birth!: Date[];
@@ -74,7 +78,7 @@ class BookingHistoryModel
   public booking_status!: string;
   public puja_status!: string;
   public payment_method!: string;
-  public payment_refference!: string;
+  public payment_reference!: string; // Corrected typo here
   public completed_image_url_path!: string | null;
   public completed_video_url_path!: string | null;
 
@@ -85,18 +89,21 @@ class BookingHistoryModel
   // Associations
   public user!: UserModel;
   public puja!: PujaModel;
-  public datespackages!: PujaDatesModel[];
+  public pujaDates!: PujaDatesModel[]; // Corrected naming
   public reviews!: ReviewsModel[];
   public assignedTasks!: AssignedTasksModel[];
   public agentdetails!: AgentDetailsModel[];
+    packages: any;
 
   public static associate() {
     BookingHistoryModel.belongsTo(UserModel, { foreignKey: 'userid', as: 'user' });
     BookingHistoryModel.belongsTo(PujaModel, { foreignKey: 'puja_id', as: 'puja' });
-    BookingHistoryModel.belongsTo(PujaDatesModel, { foreignKey: 'packages' });
+
+    BookingHistoryModel.hasMany(PujaDatesModel, { foreignKey: 'booking_id', as: 'pujaDates' });~
+
     BookingHistoryModel.hasMany(ReviewsModel, { foreignKey: 'booking_id', as: 'reviews' });
-    BookingHistoryModel.hasMany(AssignedTasksModel, { foreignKey: 'booking_id', as: 'assignedtasks' });
-    BookingHistoryModel.hasMany(AgentDetailsModel, { foreignKey: 'booking_id', as: 'agentdetails' });
+    BookingHistoryModel.hasMany(AssignedTasksModel, { foreignKey: 'booking_id', as: 'assignedTasks' });
+    BookingHistoryModel.hasMany(AgentDetailsModel, { foreignKey: 'booking_id', as: 'agentDetails' });
   }
 }
 
@@ -128,16 +135,18 @@ BookingHistoryModel.init(
       type: DataTypes.DATEONLY,
       allowNull: false,
     },
-    packages: {
-        type: DataTypes.STRING(20),
-        allowNull: false,
-        references: {
-          model: 'puja_dates_packages', // Make sure this table has a package_id column
-          key: 'packages',
-        },
-        onDelete: 'CASCADE',
-      },
-      
+    puja_name: {
+      type: DataTypes.STRING(100),
+      allowNull: false,
+    },
+    package_id: {
+      type: DataTypes.STRING(20),
+      allowNull: false,
+    },
+    package_name: {
+      type: DataTypes.STRING(100),
+      allowNull: false,
+    },
     devotee_names: {
       type: DataTypes.ARRAY(DataTypes.STRING),
       allowNull: false,
@@ -197,9 +206,9 @@ BookingHistoryModel.init(
       type: DataTypes.STRING(100),
       allowNull: false,
     },
-    payment_refference: {
+    payment_reference: {
       type: DataTypes.STRING(100),
-      allowNull: false,
+      allowNull: true,
     },
     completed_image_url_path: {
       type: DataTypes.TEXT,

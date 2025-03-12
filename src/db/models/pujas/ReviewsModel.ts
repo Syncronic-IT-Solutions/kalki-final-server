@@ -1,7 +1,8 @@
-// models/pujas/ReviewsModel.ts
 import { DataTypes, Model, Optional } from 'sequelize';
 import sequelizeConnection from '../../config';
-
+import BookingHistoryModel from '../bookings/BookingHistoryModel';
+import UserModel from '../users/usersModel';
+import PujaModel from './PujaModel';
 
 interface ReviewsAttributes {
   review_id: number;
@@ -32,8 +33,13 @@ class ReviewsModel extends Model<ReviewsAttributes, ReviewsInput> implements Rev
   public readonly updatedAt!: Date;
 
   // Define the associations
- 
+  public static associate(models: any) {
+    ReviewsModel.belongsTo(models.UserModel, { foreignKey: 'userid', as: 'users' });  // This defines the UserModel association
+    ReviewsModel.belongsTo(models.PujaModel, { foreignKey: 'puja_id', as: 'puja' });  // This defines the PujaModel association
+    ReviewsModel.belongsTo(models.BookingHistoryModel, { foreignKey: 'booking_id', as: 'booking' });  // This defines the BookingHistoryModel association
+  }
 }
+
 ReviewsModel.init(
   {
     review_id: {

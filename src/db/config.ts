@@ -4,7 +4,7 @@ dotenv.config();
 
 function getConnection() {
   // Use environment variables for database credentials
-  const sequelize = new Sequelize('Kalki', 'postgres', 'Viswa#1431', {
+  const sequelize = new Sequelize('kalkiseva', 'postgres', 'admin', {
     host: 'localhost',
     port: 5432,
     dialect: 'postgres',
